@@ -55,17 +55,12 @@ RgbColor inputColor;
 
 // stats
 unsigned long stat_start = 0;
-uint16_t stat_good = 0;
-uint16_t stat_frames = 0;
-uint16_t stat_final_good = 0;
-uint16_t stat_final_frames = 0;
 bool wantShow = false;
 
 inline void ShowMe()
 {
   if (wantShow == true && strip != NULL && strip->CanShow())
   {
-    stat_good++;
     wantShow = false;
     strip->Show();
   }
@@ -85,6 +80,7 @@ void readSerialData()
   {
     stat_start = curTime;
     strip->ClearTo(RgbColor(0, 0, 0));
+    strip->Show();
     Serial.print("Ada\n");
   }
 
@@ -116,7 +112,6 @@ void readSerialData()
       break;
 
     case AwaProtocol::HEADER_HI:
-      stat_frames++;
       currentPixel = 0;
       count = input * 0x100;
       CRC = input;
@@ -166,6 +161,7 @@ void readSerialData()
       else
       {
         wantShow = true;
+        stat_start = curTime;
         ShowMe();
         state = AwaProtocol::HEADER_A;
       }
